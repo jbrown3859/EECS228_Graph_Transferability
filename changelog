@@ -1,3 +1,4 @@
 
 
 0.0.0.1 created changelog.md, instantiated issues - jbrown3859
+0.0.0.2 added a minimal implementation of GCN on CORA dataset - sakethbachu
