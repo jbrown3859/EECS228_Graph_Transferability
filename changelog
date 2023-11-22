@@ -1,4 +1,11 @@
+# Changelog
 
+v0.0.0.1 - [@jbrown3859](https://github.com/jbrown3859)
+    - created changelog.md, instantiated issues 
 
-0.0.0.1 created changelog.md, instantiated issues - jbrown3859
-0.0.0.2 added a minimal implementation of GCN on CORA dataset - sakethbachu
+v0.0.0.2 - [@sakethbachu](https://github.com/sakethbachu)
+    - added a minimal implementation of GCN on CORA dataset 
+
+v0.0.0.3 - [@REGATTE](https://github.com/REGATTE)
+    - Added a minimal implementation of GCN on PubMed Dataset with necessary plots.
+    - Updating Changelog Formatting.
