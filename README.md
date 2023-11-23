@@ -25,6 +25,7 @@ Install the required dependencies
 ```shell
 pip install -r requirements.txt
 ```
+
 To save your updated environment (Ensure prudent use and only relevant files are placed in the requirements.txt file)
 
 ```shell
