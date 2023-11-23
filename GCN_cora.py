@@ -112,13 +112,20 @@ def train(data, plot=False):
 
 
 if __name__ == "__main__":
-    dataset = Planetoid(root='/tmp/Cora', name='Cora')
+    dataset_list = ["Cora", "PubMed"]
     
-    plot_dataset(dataset)
+    for data in dataset_list:
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = Net(dataset).to(device)
-    data = dataset[0].to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+        print("Training on {}".format(data))
+        dataset = Planetoid(root='./data', name=data)
 
-    train(data, plot=True)
+
+
+        plot_dataset(dataset)
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        model = Net(dataset).to(device)
+        data = dataset[0].to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+
+        train(data, plot=True)
