@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import torch
 import torch.nn.functional as F
 from torch_geometric.nn import MessagePassing, global_mean_pool
@@ -65,14 +62,14 @@ class GCN(torch.nn.Module):
 device ="cpu"#torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
 
 # Initialize the model with the specified number of hidden neurons
-model = GCN(dataset.num_node_features,64, dataset.num_classes).to(device)
+model = GCN(dataset.num_node_features,16, dataset.num_classes).to(device)
 
 # Split the dataset
 train_dataset, test_dataset = train_test_split(dataset, test_size=0.1)
 train_dataset, val_dataset = train_test_split(train_dataset, test_size=0.1)
 
 # Training and Testing Functions
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 # criterion = torch.nn.CrossEntropyLoss()
 criterion = F.nll_loss
 def train():
@@ -102,7 +99,7 @@ def test(dataset):
     return correct / total
 
 # Training Loop
-epochs = 200        
+epochs = 200
 train_losses = []
 val_accuracies = []
 test_accuracies = []
@@ -139,6 +136,4 @@ plt.legend()
 
 plt.tight_layout()
 plt.show()
-
-
 
