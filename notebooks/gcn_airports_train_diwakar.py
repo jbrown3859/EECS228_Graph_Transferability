@@ -8,7 +8,7 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-
+import random
 
 class GCNConv(MessagePassing):
     def __init__(self, in_channels, out_channels):
@@ -131,6 +131,27 @@ if __name__ == "__main__":
     source_features_reduced = torch.from_numpy(pca_source.fit_transform(source_features))
     source_features_reduced = source_features_reduced.to(device)
     model = Net(dataset, n_in).to(device)
-    data = dataset[0].to(device)
+    data = dataset[0]
+
+    # Split data into train and test
+    num_nodes = data.num_nodes
+    train_ratio = 0.8  # e.g., 80% of nodes for training
+    test_ratio = 0.2  # e.g., 20% of nodes for testing
+
+    indices = list(range(num_nodes))
+    random.shuffle(indices)
+    train_indices = indices[:int(num_nodes * train_ratio)]
+    test_indices = indices[int(num_nodes * train_ratio):]
+
+    train_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    train_mask[train_indices] = True
+
+    test_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    test_mask[test_indices] = True
+
+    data.train_mask = train_mask
+    data.test_mask = test_mask
+
+    data = data.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
     train(data, source_features_reduced, epochs=150, plot=False)

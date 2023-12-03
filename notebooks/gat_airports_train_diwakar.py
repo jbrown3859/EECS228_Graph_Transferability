@@ -14,6 +14,7 @@ import argparse
 from torch.nn import Linear
 import torch.nn.functional as F
 from torch_geometric.nn import GATConv #GATConv
+import random
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hc', type=int, default = 64, help = "number of hidden channels")
@@ -37,12 +38,32 @@ source_features_reduced = source_features_reduced.to(device)
 # storing the graph in the data variable
 data = dataset[0]  
 
+# Split data into train and test
+num_nodes = data.num_nodes
+train_ratio = 0.8  # e.g., 80% of nodes for training
+test_ratio = 0.2  # e.g., 20% of nodes for testing
+
+indices = list(range(num_nodes))
+random.shuffle(indices)
+train_indices = indices[:int(num_nodes * train_ratio)]
+test_indices = indices[int(num_nodes * train_ratio):]
+
+train_mask = torch.zeros(num_nodes, dtype=torch.bool)
+train_mask[train_indices] = True
+
+test_mask = torch.zeros(num_nodes, dtype=torch.bool)
+test_mask[test_indices] = True
+
+data.train_mask = train_mask
+data.test_mask = test_mask
+
+
 # some statistics about the graph.
 print(data)
 print(f'Number of nodes: {data.num_nodes}')
 print(f'Number of edges: {data.num_edges}')
-# print(f'Number of training nodes: {data.train_mask.sum()}')
-# print(f'Training node label rate: {int(data.train_mask.sum()) / data.num_nodes:.2f}')
+print(f'Number of training nodes: {data.train_mask.sum()}')
+print(f'Training node label rate: {int(data.train_mask.sum()) / data.num_nodes:.2f}')
 print(f'Is undirected: {data.is_undirected()}')
 
 
@@ -100,7 +121,7 @@ def train():
       # Use all data as input, because all nodes have node features
       out = model(source_features_reduced, data.edge_index)  
       # Only use nodes with labels available for loss calculation --> mask
-      loss = criterion(out, data.y)
+      loss = criterion(out[data.train_mask], data.y[data.train_mask])
       loss.backward() 
       optimizer.step()
       return loss
@@ -112,10 +133,11 @@ def test():
       # Use the class with highest probability.
       pred = out.argmax(dim=1)  
       # Check against ground-truth labels.
-      test_correct = pred == data.y
+      test_correct = pred[data.test_mask] == data.y[data.test_mask]
       # Derive ratio of correct predictions.
-      test_acc = int(test_correct.sum()) / int(len(data.y))
+      test_acc = int(test_correct.sum()) / int(data.test_mask.sum())
       return test_acc
+
 
 losses = []
 
